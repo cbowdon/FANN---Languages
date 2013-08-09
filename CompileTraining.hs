@@ -46,4 +46,4 @@ addClass cls = (>>= addO)
 main :: IO ()
 main =  countFile english >>= \e ->
         countFile francais >>= \f ->
-        print $ e
+        print $ unlines e
