@@ -18,6 +18,9 @@ norske = "data/Norske.txt"
 svensk :: FilePath
 svensk = "data/Svensk.txt"
 
+dataFile :: FilePath
+dataFile = "data/languages.data"
+
 empty :: Dict
 empty = Map.fromList $ zip ['a'..'z'] $ repeat 0
 
@@ -34,6 +37,7 @@ normalize lst = map ((/m) . fromIntegral) lst
 countFile :: FilePath -> IO [[Double]]
 countFile path = readFile path >>= return . map (normalize . Map.elems . countLetters) . lines
 
+{-
 addHeader :: [Int] -> [String] -> [String]
 addHeader header = (:) . unwords . map show $ header
 
@@ -41,9 +45,12 @@ addClass :: [Int] -> [String] -> [String]
 addClass cls = (>>= addO)
     where
         addO i  = [i, unwords . map show $ cls]
+-}
 
+writeTraining :: FilePath -> [[Double]] -> IO ()
+writeTraining path dat = writeFile path . unlines . map (unwords . map show) $ dat
 
 main :: IO ()
 main =  countFile english >>= \e ->
         countFile francais >>= \f ->
-        print $ unlines e
+        writeTraining dataFile $ e ++ f
