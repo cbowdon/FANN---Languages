@@ -26,8 +26,22 @@ countLetters  = foldl inc empty
     where
         inc d c = Map.update (\a -> Just (a + 1)) (Char.toLower c) d
 
-countFile :: FilePath -> IO Dict
-countFile path = readFile path >>= return . countLetters
+normalize :: [Int] -> [Double]
+normalize lst = map ((/m) . fromIntegral) lst
+    where
+        m = fromIntegral $ sum lst
+
+countFile :: FilePath -> IO [[Double]]
+countFile path = readFile path >>= return . map (normalize . Map.elems . countLetters) . lines
+
+addHeader :: [Int] -> [String] -> [String]
+addHeader header = (:) . unwords . map show $ header
+
+addClass :: [Int] -> [String] -> [String]
+addClass cls = (>>= addO)
+    where
+        addO i  = [i, unwords . map show $ cls]
+
 
 main :: IO ()
 main =  countFile english >>= \e ->
