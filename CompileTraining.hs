@@ -58,5 +58,9 @@ writeTraining :: FilePath -> [String] -> IO ()
 writeTraining path dat = writeFile path . unlines $ dat
 
 main :: IO ()
-main =  liftM (addHeader [100, 26, 4]) (readData dataFiles dataClasses) >>=
-        writeTraining trainingFile
+main =  readData dataFiles dataClasses >>= \f ->
+        let nExamples   = quot (length f) 2
+            nInput      = length dataFiles
+            nOutput     = Map.size empty
+            hdr         = [nExamples, nInput, nOutput]
+        in writeTraining trainingFile (addHeader hdr f)
