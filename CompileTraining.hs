@@ -20,8 +20,8 @@ francais = "data/Francais.txt"
 norske :: FilePath
 norske = "data/Norske.txt"
 
-svensk :: FilePath
-svensk = "data/Svensk.txt"
+svenska :: FilePath
+svenska = "data/Svensk.txt"
 
 trainingFile :: FilePath
 trainingFile = "data/languages.data"
@@ -61,7 +61,7 @@ main :: IO ()
 main =  countFile english >>= \e ->
         countFile francais >>= \f ->
         countFile norske >>= \n ->
-        countFile svensk >>= \s ->
+        countFile svenska >>= \s ->
         let trainingData =
                 addHeader [100, 26, 4] $
                 addClass [1, 0, 0, 0] e ++
