@@ -63,7 +63,7 @@ main =  countFile english >>= \e ->
         countFile norske >>= \n ->
         countFile svensk >>= \s ->
         let trainingData =
-                addHeader [25, 26, 4] $
+                addHeader [100, 26, 4] $
                 addClass [1, 0, 0, 0] e ++
                 addClass [0, 1, 0, 0] f ++
                 addClass [0, 0, 1, 0] n ++
