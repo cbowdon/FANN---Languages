@@ -1,5 +1,8 @@
 module CompileTraining
-where
+( letterFreq
+, Dict
+, empty
+) where
 
 import qualified Data.Map as Map
 import qualified Data.Char as Char
@@ -34,18 +37,17 @@ normalize lst = map ((/m) . fromIntegral) lst
     where
         m = fromIntegral $ sum lst
 
+letterFreq :: String -> [Double]
+letterFreq = normalize . Map.elems . countLetters
+
 countFile :: FilePath -> IO [[Double]]
-countFile path = readFile path >>= return . map (normalize . Map.elems . countLetters) . lines
+countFile path = readFile path >>= return . map letterFreq . lines
 
-{-
-addHeader :: [Int] -> [String] -> [String]
-addHeader header = (:) . unwords . map show $ header
+addClass :: [Double] -> [[Double]] -> [[Double]]
+addClass cls = (>>= \s -> [s, cls])
 
-addClass :: [Int] -> [String] -> [String]
-addClass cls = (>>= addO)
-    where
-        addO i  = [i, unwords . map show $ cls]
--}
+addHeader :: [Double] -> [[Double]] -> [[Double]]
+addHeader hdr = (hdr:)
 
 writeTraining :: FilePath -> [[Double]] -> IO ()
 writeTraining path dat = writeFile path . unlines . map (unwords . map show) $ dat
@@ -53,4 +55,12 @@ writeTraining path dat = writeFile path . unlines . map (unwords . map show) $ d
 main :: IO ()
 main =  countFile english >>= \e ->
         countFile francais >>= \f ->
-        writeTraining dataFile $ e ++ f
+        countFile norske >>= \n ->
+        countFile svensk >>= \s ->
+        let fileData =
+                addHeader [25, 26, 4] $
+                addClass [1, 0, 0, 0] e ++
+                addClass [0, 1, 0, 0] f ++
+                addClass [0, 0, 1, 0] n ++
+                addClass [0, 0, 0, 1] s
+        in return fileData >>= writeTraining dataFile
