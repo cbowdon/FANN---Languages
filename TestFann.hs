@@ -16,14 +16,8 @@ norskeLn = "Så vidt jeg vet er det ikke et folkekrav å doble Oslos befolkning 
 svenskaLn :: String
 svenskaLn = "Längre västerut fick sent på fredagen de flesta av de runt 1.000 personer som evakuerats återvända till sina hem – de som hade hem att återvända till. Över 70 kvadratkilometer har brunnit, och 26 bostadshus har förstörts."
 
-testSentence :: String -> FannPtr -> IO ()
-testSentence sentence fann = runFann fann (letterFreq sentence) >>= print
+testSentence :: FannPtr -> String -> IO ()
+testSentence fann sentence = runFann fann (letterFreq sentence) >>= print
 
 main :: IO ()
-main = withSavedFann annFile testSentences
-    where
-        testSentences fann = do
-            testSentence englishLn fann
-            testSentence francaisLn fann
-            testSentence norskeLn fann
-            testSentence svenskaLn fann
+main = withSavedFann annFile $ \fann -> mapM_ (testSentence fann) [englishLn, francaisLn, norskeLn, svenskaLn]

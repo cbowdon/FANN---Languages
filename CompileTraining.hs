@@ -10,18 +10,13 @@ import qualified Data.Char as Char
 import Control.Monad
 
 type Dict = Map.Map Char Int
+type LangData = [[Double]]
 
-english :: FilePath
-english = "data/English.txt"
+dataFiles :: [FilePath]
+dataFiles = ["data/English.txt", "data/Francais.txt", "data/Norske.txt", "data/Svenska.txt"]
 
-francais :: FilePath
-francais = "data/Francais.txt"
-
-norske :: FilePath
-norske = "data/Norske.txt"
-
-svenska :: FilePath
-svenska = "data/Svensk.txt"
+dataClasses :: LangData
+dataClasses = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
 
 trainingFile :: FilePath
 trainingFile = "data/languages.data"
@@ -42,30 +37,26 @@ normalize lst = map ((/m) . fromIntegral) lst
 letterFreq :: String -> [Double]
 letterFreq = normalize . Map.elems . countLetters
 
-countFile :: FilePath -> IO [[Double]]
+countFile :: FilePath -> IO LangData
 countFile path = liftM (map letterFreq . lines) (readFile path)
 
-addClass :: [Double] -> [[Double]] -> [[Double]]
+addClass :: [Double] -> LangData -> LangData
 addClass cls = (>>= \s -> [s, cls])
 
-addHeader :: [Int] -> [[Double]] -> [String]
+addHeader :: [Int] -> LangData -> [String]
 addHeader hdr dat = h:d
     where
         h = unwords . map show $ hdr
         d = map (unwords . map show) dat
 
+readData :: [FilePath] -> LangData -> IO LangData
+readData files classes = liftM concat $ mapM mkData $ zip files classes
+    where
+        mkData (f,c) = liftM (addClass c) $ countFile f
+
 writeTraining :: FilePath -> [String] -> IO ()
 writeTraining path dat = writeFile path . unlines $ dat
 
 main :: IO ()
-main =  countFile english >>= \e ->
-        countFile francais >>= \f ->
-        countFile norske >>= \n ->
-        countFile svenska >>= \s ->
-        let trainingData =
-                addHeader [100, 26, 4] $
-                addClass [1, 0, 0, 0] e ++
-                addClass [0, 1, 0, 0] f ++
-                addClass [0, 0, 1, 0] n ++
-                addClass [0, 0, 0, 1] s
-        in writeTraining trainingFile trainingData
+main =  liftM (addHeader [100, 26, 4]) (readData dataFiles dataClasses) >>=
+        writeTraining trainingFile
