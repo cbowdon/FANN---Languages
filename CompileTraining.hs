@@ -60,7 +60,7 @@ writeTraining path dat = writeFile path . unlines $ dat
 main :: IO ()
 main =  readData dataFiles dataClasses >>= \f ->
         let nExamples   = quot (length f) 2
-            nInput      = length dataFiles
-            nOutput     = Map.size empty
+            nInput      = Map.size empty
+            nOutput     = length dataFiles
             hdr         = [nExamples, nInput, nOutput]
         in writeTraining trainingFile (addHeader hdr f)
